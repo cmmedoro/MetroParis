@@ -13,54 +13,35 @@ public class RegistraAlberoDiVisita implements TraversalListener<Fermata, Defaul
 
 	private Map<Fermata, Fermata> alberoInverso;
 	private Graph<Fermata, DefaultEdge> grafo;
-	
 	public RegistraAlberoDiVisita(Map<Fermata, Fermata> alberoInverso, Graph<Fermata, DefaultEdge> g) {
-		super();
 		this.alberoInverso = alberoInverso;
 		this.grafo = g;
 	}
-
-	@Override
 	public void connectedComponentFinished(ConnectedComponentTraversalEvent e) {
 		// TODO Auto-generated method stub
-		
 	}
-
-	@Override
 	public void connectedComponentStarted(ConnectedComponentTraversalEvent e) {
 		// TODO Auto-generated method stub
-		
 	}
-
-	@Override
 	public void edgeTraversed(EdgeTraversalEvent<DefaultEdge> e) {
 	//	System.out.println(e.getEdge()); //per vedere gli archi che sono attraversati
-		
 		Fermata source = this.grafo.getEdgeSource(e.getEdge());
 		Fermata target = this.grafo.getEdgeTarget(e.getEdge());
-		
 		//System.out.println(source + " -- " + target);
-		
 		if(!alberoInverso.containsKey(target)) {
 			alberoInverso.put(target, source);
-			System.out.println(target + " si raggiunge da "+ source);
+		//	System.out.println(target + " si raggiunge da "+ source);
 		}
 		else if(!alberoInverso.containsKey(source)) {
 			alberoInverso.put(source, target);
-			System.out.println(source + " si raggiunge da "+ target);
+		//	System.out.println(source + " si raggiunge da "+ target);
 		}
 	}
-
-	@Override
 	public void vertexTraversed(VertexTraversalEvent<Fermata> e) {
 		// TODO Auto-generated method stub
-		
 	}
-
-	@Override
 	public void vertexFinished(VertexTraversalEvent<Fermata> e) {
 		// TODO Auto-generated method stub
-		
 	}
 
 }

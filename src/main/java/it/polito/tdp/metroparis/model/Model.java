@@ -34,16 +34,9 @@ public class Model {
 		}
 		return this.fermate;
 	}
-	
-	public List<Fermata> calcolaPercorso(Fermata partenza, Fermata arrivo) {
-		creaGrafo() ;
-		visitaGrafo(partenza);
-		return null ;
-	}
 
 	public void creaGrafo() {
 		this.grafo = new SimpleDirectedGraph<Fermata, DefaultEdge>(DefaultEdge.class);
-
 //		Graphs.addAllVertices(this.grafo, this.fermate);
 		Graphs.addAllVertices(this.grafo, getFermate());
 		
@@ -59,27 +52,46 @@ public class Model {
 //		System.out.println("Archi   = " + this.grafo.edgeSet().size());
 	}
 
+	public List<Fermata> calcolaPercorso(Fermata partenza, Fermata arrivo) {
+		creaGrafo() ;
+		Map<Fermata, Fermata> alberoInverso = visitaGrafo(partenza);
+		//creo lista che contiene il solo vertice di arrivo, che ogni volta prende il vertice precedente
+		Fermata corrente = arrivo;
+		List<Fermata> percorso = new ArrayList<>();
+		
+		//iterazione: finchè non sono arrivato alla radice (null = predecessore messo nella mappa del nodo di partenza)
+		//ogni volta che trovo un vertice corrente lo aggiungo alla lista, poi passo al nodo precedente e così via.
+		while( corrente!=null ) {
+			percorso.add(corrente);
+			corrente = alberoInverso.get(corrente);
+			//corrente = getParent(corrente); ---> non devo implementare il Listener
+		}
+		return percorso ;
+	}
 	
-	
-	public void visitaGrafo(Fermata partenza) {
-		GraphIterator<Fermata, DefaultEdge> visita = new BreadthFirstIterator<>(this.grafo, partenza);
+	public Map<Fermata, Fermata> visitaGrafo(Fermata partenza) {
+		//uso numero minimo di archi a partire dall'insieme di partenza:
+		GraphIterator<Fermata, DefaultEdge> visita = new BreadthFirstIterator<>(this.grafo, partenza); 
 		
 		Map<Fermata,Fermata> alberoInverso = new HashMap<>() ;
 		alberoInverso.put(partenza, null) ;
 		
 		visita.addTraversalListener(new RegistraAlberoDiVisita(alberoInverso, this.grafo));
+		//albero inverso: dato un vertice il suo predecessore è uno solo (rappre univoca) + non ho bisogno di algoritmo ricorsivo per trovare
+		//il percorso, come farei con un albero normale, che ha tanti successori e ad ogni bivio avrei più possibilità da scegliere.
 		while (visita.hasNext()) {
 			Fermata f = visita.next();
 //			System.out.println(f);
 		}
-		
-		
+		return alberoInverso;
 		// Ricostruiamo il percorso a partire dall'albero inverso (pseudo-code)
 //		List<Fermata> percorso = new ArrayList<>() ;
 //		fermata = arrivo
 //		while(fermata != null)
 //			fermata = alberoInverso.get(fermata)
 //			percorso.add(fermata)
+		
+		//problema di questo algoritmo: non conosce arrivo ---> procedura di visita fatta da calcolaPercorso
 	}
 
 }

@@ -6,10 +6,14 @@ import java.util.ResourceBundle;
 
 import it.polito.tdp.metroparis.model.Fermata;
 import it.polito.tdp.metroparis.model.Model;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.cell.PropertyValueFactory;
 
 public class MetroController {
 	
@@ -29,6 +33,14 @@ public class MetroController {
 
     @FXML
     private TextArea txtResult;
+    
+
+    @FXML
+    private TableColumn<Fermata, String> Fermata; // primo generic = quello della tabella, mentre il secondo è il tipo del dato 
+    //che metto nella colonna. OClonna ha bisogno di sapere come fare ad estrarre la stringa dalla fermata.
+    
+    @FXML
+    private TableView<Fermata> tablePercorso;
 
     @FXML
     void handleRicerca(ActionEvent event) {
@@ -36,7 +48,8 @@ public class MetroController {
     	Fermata arrivo = this.cmbArrivo.getValue();
     	if(partenza != null && arrivo!=null && !partenza.equals(arrivo)) {
     		List<Fermata> percorso = this.model.calcolaPercorso(partenza, arrivo);
-    		this.txtResult.setText(percorso.toString());
+    		this.tablePercorso.setItems(FXCollections.observableArrayList(percorso));
+    		this.txtResult.setText("Percorso trovato con "+percorso.size()+" stazioni\n");
     	}else {
     		this.txtResult.setText("Devi selezionare due stazioni diverse tra loro\n");
     	}
@@ -54,7 +67,10 @@ public class MetroController {
         assert cmbArrivo != null : "fx:id=\"cmbArrivo\" was not injected: check your FXML file 'Metro.fxml'.";
         assert cmbPartenza != null : "fx:id=\"cmbPartenza\" was not injected: check your FXML file 'Metro.fxml'.";
         assert txtResult != null : "fx:id=\"txtResult\" was not injected: check your FXML file 'Metro.fxml'.";
-
+        //ogni colonna riceve l'info sull'intero oggetto ed estrae la stringa da visualizzare:
+        //uso PropertyValueFactory con gli stessi generics della colonna, passando come parametro il nome della colonna da visualizzare,
+        //ovvero il nome dell'attributo che ci interessa
+        Fermata.setCellValueFactory(new PropertyValueFactory<Fermata, String>("nome"));
     }
 
 }
